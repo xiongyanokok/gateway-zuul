@@ -1,9 +1,13 @@
 package com.xy.gateway.filter;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
 
 /**
  * 访问过滤器
@@ -31,6 +35,13 @@ public class AccessFilter extends ZuulFilter {
 	@Override
 	public Object run() {
 		System.out.println("gateway-zuul");
+		
+		RequestContext ctx = RequestContext.getCurrentContext();
+		ctx.addZuulResponseHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
+		ctx.setSendZuulResponse(false);
+		ctx.setResponseStatusCode(HttpServletResponse.SC_OK);
+		ctx.setResponseBody("{\"data\":\"成功\"}");
+		
 		return null;
 	}
 

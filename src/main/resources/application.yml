@@ -13,8 +13,8 @@ server:
   port: 8000
   tomcat:
     uri-encoding: UTF-8
-    accept-count: 1000
-    max-threads: 1000
+    accept-count: 10000
+    max-threads: 10000
 
 logging:
   config: classpath:logback.xml
