@@ -1,19 +1,18 @@
 package com.xy.gateway.filter;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import com.xy.gateway.util.GatewayUtils;
 
 /**
- * 访问过滤器
- * 1，资源过滤
- * 2，开关控制
- * 3，黑名单过滤
+ * 过滤器
  * 
  * @author xiongyan
  * @date 2017年12月18日 上午11:01:57
@@ -34,14 +33,21 @@ public class AccessFilter extends ZuulFilter {
 	 */
 	@Override
 	public Object run() {
-		System.out.println("gateway-zuul");
+		Route route = GatewayUtils.getRoute();
+		String id = route.getId();
+		if (!"baidu".equals(id)) {
+			GatewayUtils.responseBody("{\"data\":\"资源 不存在\"}");
+			return null;
+		}
 		
-		RequestContext ctx = RequestContext.getCurrentContext();
-		ctx.addZuulResponseHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE);
-		ctx.setSendZuulResponse(false);
-		ctx.setResponseStatusCode(HttpServletResponse.SC_OK);
-		ctx.setResponseBody("{\"data\":\"成功\"}");
-		
+		HttpServletRequest request = RequestContext.getCurrentContext().getRequest(); 
+		StringBuffer url = request.getRequestURL();
+		String query = request.getQueryString();
+		if (StringUtils.isNotEmpty(query)) {
+			url.append("?");
+			url.append(query);
+		}
+		System.out.println(url);
 		return null;
 	}
 
