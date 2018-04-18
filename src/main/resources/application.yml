@@ -26,9 +26,4 @@ zuul:
     connect-timeout-millis: 2000
     socket-timeout-millis: 5000
 
-  #路由  
-  routes:
-    baidu:
-      path: /**
-      stripPrefix: true
-      url: https://www.baidu.com
+  

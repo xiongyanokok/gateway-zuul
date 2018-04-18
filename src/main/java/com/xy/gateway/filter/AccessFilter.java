@@ -3,12 +3,14 @@ package com.xy.gateway.filter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
 import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import com.xy.gateway.config.CustomRouteLocator;
 import com.xy.gateway.util.GatewayUtils;
 
 /**
@@ -19,6 +21,9 @@ import com.xy.gateway.util.GatewayUtils;
  */
 @Component
 public class AccessFilter extends ZuulFilter {
+	
+	@Autowired
+	CustomRouteLocator customRouteLocator;
 	
 	/**
 	 * 是否执行该过滤器
@@ -33,12 +38,17 @@ public class AccessFilter extends ZuulFilter {
 	 */
 	@Override
 	public Object run() {
+		if ("/baidu/refresh".equals(RequestContext.getCurrentContext().getRequest().getRequestURI())) {
+			customRouteLocator.refresh();
+			GatewayUtils.responseBody("{\"data\":\"刷新成功\"}");
+			return null;
+		}
 		Route route = GatewayUtils.getRoute();
-		String id = route.getId();
+		/*String id = route.getId();
 		if (!"baidu".equals(id)) {
 			GatewayUtils.responseBody("{\"data\":\"资源 不存在\"}");
 			return null;
-		}
+		}*/
 		
 		HttpServletRequest request = RequestContext.getCurrentContext().getRequest(); 
 		StringBuffer url = request.getRequestURL();
